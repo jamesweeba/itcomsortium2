@@ -1,13 +1,12 @@
 
 let pgstream = require("pgconnect-lite");
-let { status: taskStatus,fetchSatus } = require("./service")
+let { status: taskStatus, fetchSatus } = require("./service")
 
 async function status(req, res) {
     let dbConnection;
     try {
-        if(req.user.role!="admin"){
+        if (req.user.role != "admin") {
             return res.status(201).json(status)
-
 
         }
         let payload = req.body;
