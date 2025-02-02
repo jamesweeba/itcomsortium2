@@ -17,5 +17,9 @@
     "jsonwebtoken": "^8.5.0",
     "nodemon": "^3.1.9",
     "pgconnect-lite": "^1.1.7"
+  },
+
+  "engines": {
+    "node": "10.16.0"
   }
 }
