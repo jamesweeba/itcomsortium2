@@ -1,5 +1,6 @@
-const { func } = require("joi");
+
 let jwt = require("jsonwebtoken");
+let{jwtSecret}=require("../config/config")
 let mySecretKey = "a4";
 
 
@@ -12,21 +13,12 @@ function authorize(req, res, next) {
                 return res.status(498).json({ statusCode: 498, message: 'User Not Authorized' });
             }
             let decoded = await verifyToken(token);
-
-            console.log("nnnnnnnnnnnnnnnnnnnnnnnnnnn")
-            console.log(decoded);
-            console.log("nnnnnnnnnnnnnnnnnnnnnnnnnnn")
-           
-
             req.user = decoded;
             next()
             //req.user = user;
 
         } catch (err) {
             return res.status(err.statusCode).json(err);
-
-
-
 
         }
 
@@ -37,7 +29,7 @@ function authorize(req, res, next) {
 
 function verifyToken(token) {
     return new Promise((resolve, reject) => {
-        jwt.verify(token, mySecretKey, (err, res) => {
+        jwt.verify(token, jwtSecret, (err, res) => {
             if (err) {
                 console.log(err)
                 return reject({ statusCode: 498, message: 'User Not Authorized' })

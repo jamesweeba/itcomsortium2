@@ -15,10 +15,11 @@ async function creatTask(req, res) {
             return res.status(400).json(err)
         }
         payload.userId = req.user.id;
+        payload.user=req.user;
         dbConnection = await pgstream.connect();
         let task = await createTask(payload, dbConnection);
         pgstream.commit(dbConnection);
-        return res.status(201).json(task)
+        return res.status(201).json({message:"Created",statusCode:201,data:task})
     } catch (err) {
         pgstream.commit(dbConnection);
         return res.status(500).json(err)
@@ -31,7 +32,6 @@ async function getTasks(req, res) {
     let dbConnection;
     try {
         let payload = req.query;
-        //validation comes here
         let isValid = validate(taskSearchSchema, payload);
         if (!isValid.isValid) {
             let { err } = isValid
@@ -75,7 +75,7 @@ async function getTask(req, res) {
         if (!task) {
             return res.status(404).json({ statusCode: 404, message: "Not Found" })
         }
-        return res.status(200).json(task)
+        return res.status(200).json({message:"success", statusCode:200,data:task})
 
     } catch (err) {
         pgstream.commit(dbConnection)
@@ -97,25 +97,20 @@ async function updateTask(req, res) {
             let { err } = isValid
             return res.status(400).json(err)
         }
-        // updateSchema
-        // process.exit(1)
-
         payload.user = req.user
         dbConnection = await pgstream.connect();
         let task = await updatedTask(payload, dbConnection);
         pgstream.commit(dbConnection)
-        return res.status(200).json(task)
+        return res.status(200).json({message:"success",statusCode:200,data:task})
     } catch (err) {
         console.log(err)
         pgstream.commit(dbConnection)
-
         return res.status(500).json(err)
 
     }
 
 
 }
-
 
 async function deleteTask(req, res) {
     let dbConnection;

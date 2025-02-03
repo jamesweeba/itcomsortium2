@@ -10,15 +10,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.6",
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
-    "joi": "^17.13.3",
     "jsonwebtoken": "^8.5.0",
     "nodemon": "^3.1.9",
-    "pgconnect-lite": "^1.1.7"
+    "pgconnect-lite": "^1.1.7",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.6.0"
   },
-
   "engines": {
     "node": "10.16.0"
   }

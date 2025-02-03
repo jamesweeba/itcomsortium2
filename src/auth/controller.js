@@ -13,6 +13,7 @@ async function createUser(req, res) {
     let dbConnection;
     try {
         let payload = req.body;
+       
         let isValid = validate(signupSchema, payload);
         if (!isValid.isValid) {
             let { err } = isValid
@@ -20,8 +21,9 @@ async function createUser(req, res) {
         }
         dbConnection = await pgstream.connect();
         let userCreated = await user(payload, dbConnection);
-        let { id, email,role } = userCreated;
-         let jwtToken=signToken({id,email,role});
+        let { id, username,role } = userCreated;
+         let jwtToken=signToken({id,username,role});
+         
         pgstream.commit(dbConnection)
         return res.status(201).json({data:userCreated,token:jwtToken});
 
@@ -50,8 +52,8 @@ async function login(req, res) {
         }
         dbConnection = await pgstream.connect();
         let loggedIn = await userLogin(payload, dbConnection);
-        let { id, email,role } = loggedIn;
-        let jwtToken=signToken({id,email,role})
+        let { id, username,role } = loggedIn;
+        let jwtToken=signToken({id,username,role})
         pgstream.commit(dbConnection)
         return res.status(201).json({data:loggedIn,token:jwtToken});
     } catch (err) {
@@ -64,13 +66,15 @@ async function login(req, res) {
 
 
 function signToken(payload) {
-
-    const token = jwt.sign(payload, mySecretKey, {
+    const token = jwt.sign(payload,jwtSecret, {
         expiresIn: "7d"
     });
     return token;
 
 }
+// const token = jwt.sign(payload, config.jwtSecret, {
+//     expiresIn: "7d"
+// });
 
 
 

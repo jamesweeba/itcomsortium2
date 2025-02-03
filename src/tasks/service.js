@@ -15,7 +15,11 @@ function createTask(payload, dbConnection) {
             let { title, userId, description } = payload;
             let params = [title, userId, statusId, priorityId, description, userId];
             let query = await pg.insert(dbConnection, sql, params);
-            return resolve(query.data)
+            let { data } = query;
+            let { items } = data;
+            items[0].user = payload.user;
+            let createdTask = await getTask(items[0], dbConnection)
+            return resolve(createdTask)
         } catch (err) {
             return reject(err)
         }
@@ -41,9 +45,8 @@ function getTasks(payload, dbConnection) {
             delete payload.user;
 
             let modifiedPayload = modifySearchPayload(payload);
-            let sqlField = ["title", "s.name", "p.name"];
-            let fltererdFilters = [...transformedSqlFields].filter(item => item != "status" && item != "priority");
-
+            console.log(modifiedPayload);
+            let sqlField = ["title", "s.name", "p.name", "state", "description", "expires_at::date"].filter(item => modifiedPayload[item]);
             let sql = `select t.*,s.name as status,p.name as prority from tasks t 
                         join status s  on t.status_id::text=s.id::text
                         join priorities p on t.priority_id::text=p.id::text
@@ -81,7 +84,6 @@ function getTasks(payload, dbConnection) {
                 }
 
             }
-
             let query = await pg.fetch(dbConnection, sql, params);
             let { data } = query;
             let { items, count } = data;
@@ -90,16 +92,13 @@ function getTasks(payload, dbConnection) {
 
             }
 
-            console.log("mmmmmmmmmmmmmmmmmmmmm")
 
-            console.log(count);
-            console.log("mmmmmmmmmmmmmmmmmmmmm")
             let results = {
                 page,
                 limit,
                 totalPages,
                 totalTasks: parseInt(totalTaskCount.count),
-                items
+                data: items
             }
 
             return resolve(results)
@@ -115,9 +114,6 @@ function getTasks(payload, dbConnection) {
 function getTask(payload, dbConnection) {
     return new Promise(async (resolve, reject) => {
         try {
-
-            // console.log("pppppppppppppppppppppppppppppppppppp",payload);
-            // process.exit(1)
             let { id, user } = payload;
             let { id: userId, role } = user;
             let sql = `select t.*,s.name as status,p.name as priority from tasks t join  status s 
@@ -136,7 +132,6 @@ function getTask(payload, dbConnection) {
             let query = await pg.fetchOne(dbConnection, sql, params);
             let { data } = query;
             return resolve(data)
-
         } catch (err) {
             return reject(err)
 
@@ -148,15 +143,21 @@ function getTask(payload, dbConnection) {
 function updateTask(payload, dbConnection) {
     return new Promise(async (resolve, reject) => {
         try {
+            let { user } = payload;
+            let { id } = user
             let modifiedPayload = modifyUpdatePayload(payload)
-            let sqlFields = ["title", "description", "status_id", "priority_id", "assinged_to","state"];
+            let sqlFields = ["title", "description", "status_id", "priority_id", "assinged_to", "state"].filter(item => modifiedPayload[item]);
             let sql = `update tasks set ` + sqlFields.map((v, i) => v + `=$` + (i + 1)).join(`,`) + ` where id=$` + (sqlFields.length + 1) + ` returning id`;
+            if (payload.user.role != "admin") {
+                sql = `update tasks set ` + sqlFields.map((v, i) => v + `=$` + (i + 1)).join(`,`) + ` where  assinged_to='${id}' and id=$` + (sqlFields.length + 1) + ` returning id`;
+
+            }
             let params = sqlFields.map(item => modifiedPayload[item]);
             params.push(payload.id)
             let update = await pg.update(dbConnection, sql, params);
             let { data } = update;
             let { items } = data;
-             let aTask = await getTask(payload, dbConnection);
+            let aTask = await getTask(payload, dbConnection);
             return resolve(aTask);
         } catch (err) {
             return reject(err)
@@ -217,6 +218,11 @@ function modifySearchPayload(payload) {
     if (payload.hasOwnProperty('priority')) {
         payload["p.name"] = payload.priority;
         delete payload.priority;
+    }
+    if (payload.hasOwnProperty('deadline')) {
+        payload["expires_at::date"] = payload.deadline;
+        delete payload.deadline;
+
     }
     return payload;
 

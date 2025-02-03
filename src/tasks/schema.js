@@ -43,18 +43,7 @@ let updateSchema={
     additionalProperties: false,
 
 }
-/*
-{ id: '1188745e-974b-45fe-9c5d-67dafa129586',
-  assingedTo: '3',
-  title: 'go to schoo1l',
-  statusId: 'a049080e-5173-485d-b44b-166dc1046da9',
-  priorityId: '3adffdca-75d6-4335-a615-163571ffe87a',
-  state: 'A',
-  description: 'ppp' }
-        console.log("mmmmmmmmmmmmmmmmmmmm")
 
-
-*/
 
 module.exports = {
     taskSchema,

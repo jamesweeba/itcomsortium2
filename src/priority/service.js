@@ -1,6 +1,6 @@
 
 let pg = require("pgconnect-lite")
-function priorities(payload, dbConnection) {
+function createPriority(payload, dbConnection) {
     return new Promise(async (resolve, reject) => {
         try {
             let { name } = payload
@@ -8,7 +8,8 @@ function priorities(payload, dbConnection) {
             let params = [name]
             let query = await pg.insert(dbConnection, sql, params);
             let { data } = query;
-            return resolve(data)
+            let{items}=data;
+            return resolve(items[0])
         } catch (err) {
 
             return reject(err)
@@ -24,8 +25,8 @@ function getProirityByName(dbConnection) {
         try {
             let sql = `select * from priorities where lower(name)=$1`;
             let param = [name]
-            let status = await pg.fetchOne(dbConnection, sql, param);
-            return resolve(status.data)
+            let priority = await pg.fetchOne(dbConnection, sql, param);
+            return resolve(priority.data)
         } catch (err) {
             return reject(err)
         }
@@ -33,8 +34,26 @@ function getProirityByName(dbConnection) {
     })
 }
 
+function fetchPriority(payload,dbConnection) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let sql = `select * from priorities`;
+            let param = [];
+            let priorities = await pg.fetch(dbConnection, sql, param);
+            let{data}=priorities;
+            let {items}=data;
+            return resolve(items)
+        } catch (err) {
+            return reject(err)
+
+        }
+
+    })
+}
+
 
 module.exports = {
-    priorities,
-    getProirityByName
+    createPriority,
+    getProirityByName,
+    fetchPriority
 }

@@ -8,7 +8,8 @@ function status(payload, dbConnection) {
             let params = [name]
             let createdStatus = await pg.insert(dbConnection, sql, params);
             let { data } = createdStatus;
-            return resolve(data)
+            let{items}=data;
+            return resolve(items[0])
 
         } catch (err) {
 
@@ -28,7 +29,8 @@ function fetchSatus(payload, dbConnection) {
             let params=[];
             let retrivedStatus=await pg.fetch(dbConnection,sql,params);
             let{data}=retrivedStatus;
-            return resolve(data);
+            let{items}=data;
+            return resolve(items);
 
         } catch (err) {
             return reject(err)
