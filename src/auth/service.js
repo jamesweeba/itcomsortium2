@@ -9,7 +9,7 @@ function createUser(payload, dbConnection) {
             let sql = `insert into users(email,password,first_name,last_name) values ($1,$2,$3,$4) returning *`;
             let { username, password, firstName, lastName } = payload;
             let passwordHash = bcrypt.hashSync(password);
-            let params = [username, passwordHash, firstName, lastName]
+            let params = [username.toLowerCase(), passwordHash, firstName, lastName]
             let query = await pgstream.insert(dbConnection, sql, params);
             let result = query.data.items[0];
             delete result.password;
@@ -24,9 +24,9 @@ function createUser(payload, dbConnection) {
 function userLogin(payload, dbConnection) {
     return new Promise(async (resolve, reject) => {
         try {
-            let sql = `select * from users where email=$1`;
+            let sql = `select * from users where lower(email)=$1`;
             let { username, password: userpassword } = payload;
-            let params = [username];
+            let params = [username.toLowerCase()];
             let query = await pgstream.fetchOne(dbConnection, sql, params);
             let { password } = query.data;
             if (!password) return reject({ message: "Invalid Credentials" });
