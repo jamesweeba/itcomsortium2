@@ -56,7 +56,6 @@ app.use("/api/v1/status", status);
 app.use("/api/v1/priorities", priority);
 app.use("/api/v1/users",user)
 
-//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
 
 app.listen(PORT, () => {
     console.log(`magic happens on ${PORT}`)
