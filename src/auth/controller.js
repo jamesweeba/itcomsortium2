@@ -4,7 +4,6 @@ const pgstream = require("pgconnect-lite");
 const { signupSchema, loginSchema } = require("./schema");
 const { validate } = require("../validator/validate");
 const{jwtSecret}=require("../config/config")
-let mySecretKey = "a4";
 const jwt = require("jsonwebtoken");
 
 

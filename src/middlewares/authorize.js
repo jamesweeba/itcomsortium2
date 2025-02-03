@@ -1,7 +1,7 @@
 
 let jwt = require("jsonwebtoken");
 let{jwtSecret}=require("../config/config")
-let mySecretKey = "a4";
+
 
 
 
