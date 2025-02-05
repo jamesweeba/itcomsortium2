@@ -28,7 +28,13 @@ function userLogin(payload, dbConnection) {
             let { username, password: userpassword } = payload;
             let params = [username.toLowerCase()];
             let query = await pgstream.fetchOne(dbConnection, sql, params);
-            let { password } = query.data;
+            console.log(query);
+            console.log("llllllllllllllllllllllllllll")
+            let { password, data} = query.data;
+            if(!data){
+                return reject({ message: "User Not Authorised" });
+
+            }
             if (!password) return reject({ message: "Invalid Credentials" });
             let pwCompare = bcrypt.compareSync(userpassword, password);
             if (!pwCompare) return reject({ message: "Invalid Credentials" });
